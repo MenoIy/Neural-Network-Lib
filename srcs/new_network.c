@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/26 14:37:59 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/26 19:33:20 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/27 18:31:17 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void		del_network(t_network **net)
 	*net = NULL;
 }
 
-t_network	*new_network(int in, int hidden, int out)
+t_network	*new_network(int in, int hidden, int out, double lr)
 {
 	t_network	*net;
 
@@ -38,6 +38,7 @@ t_network	*new_network(int in, int hidden, int out)
 	net->in_count = in;
 	net->hidden_count = hidden;
 	net->out_count = out;
+	net->lr = lr;
 	if (!(net->hidden_weight = new_matrix(in, hidden)))
 	{
 		del_network(&net);

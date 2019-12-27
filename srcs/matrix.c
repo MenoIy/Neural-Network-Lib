@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/26 15:28:11 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/26 19:48:05 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/26 21:16:54 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,22 @@ void		del_matrix(t_matrix **matrix)
 	todel = NULL;
 }
 
+t_matrix	*matrix_cpy(t_matrix *a)
+{
+	t_matrix	*new;
+
+	if (!(new = new_matrix(a->col, a->row)))
+		return NULL;
+	for (int i = 0; i < a->row; i++)
+	{
+		for (int j = 0; j < a->col; j++)
+		{
+			new->tab[i][j] = a->tab[i][j];
+		}
+	}
+	return new;
+}
+
 void	matrix_randomize(t_matrix	*matrix)
 {
 	srand ( time ( NULL));
@@ -49,7 +65,7 @@ void	matrix_randomize(t_matrix	*matrix)
 	{
 		for (int j = 0; j < matrix->col; j++)
 		{
-			matrix->tab[i][j] = (double)rand() / RAND_MAX * 2.0 - 1.0;;
+			matrix->tab[i][j] = (double)rand() / RAND_MAX * 2.0 - 1.0;
 		}
 	}
 }

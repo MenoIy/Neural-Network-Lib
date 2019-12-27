@@ -6,11 +6,25 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/26 16:09:24 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/26 19:47:37 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/27 17:11:33 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "nnl.h"
+
+void	matrix_sub(t_matrix	*matrix, t_matrix *to_sub, double value)
+{
+	for (int i = 0; matrix->tab[i]; i++)
+	{
+		for (int j = 0; j <  matrix->col; j++)
+		{
+			if (to_sub)
+				matrix->tab[i][j] -= to_sub->tab[i][j];
+			else
+				matrix->tab[i][j] -= value;
+		}
+	}
+}
 
 void	matrix_add(t_matrix	*matrix, t_matrix *to_add, double value)
 {

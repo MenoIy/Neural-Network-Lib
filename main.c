@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/26 15:21:51 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/26 19:50:27 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/26 22:02:45 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,20 +17,14 @@ int main()
 	t_network	*net;
 	t_matrix	*in;
 
-	in = new_matrix(1, 2);
+	in = new_matrix(1, 3);
 	matrix_randomize(in);
+	t_matrix *target;
+	target = new_matrix(1, 2);
 
-	net = new_network(2, 2, 1);
+	net = new_network(3, 5, 2, 2.0);
 
-
-	print_matrix(net->hidden_bias);
-	print_matrix(net->hidden_weight);
-	print_matrix(net->out_bias);
-	print_matrix(net->out_weight);
-	t_matrix	*out;
-
-	out = feedforward(net, in);
-	print_matrix(out);
+	train(net, in, target);
 	del_network(&net);
 	return (0);
 }
