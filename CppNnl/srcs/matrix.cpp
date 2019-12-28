@@ -6,11 +6,16 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 16:06:47 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/28 18:35:03 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/29 00:34:39 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "matrix.hpp"
+
+void	Matrix::shape()
+{
+	cout << "{ " << this->row << " , " << this->col << " }" << "\n";
+}
 
 void	Matrix::print()
 {

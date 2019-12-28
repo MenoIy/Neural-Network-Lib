@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 16:04:44 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/28 22:22:48 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/29 00:46:56 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ void	get_data(string line, struct Data **data)
 
 	int pos = 0;
 	double	d = 0.0;
-
 	while (pos < line.size())
 	{
 		if ((pos = line.find_first_of (',',pos)) != std::string::npos)
@@ -49,7 +48,7 @@ int main()
 {
 	ifstream	train("data/train.csv");
 	ifstream	test("data/test.csv");
-	string		line;
+	string		line = "";
 	Network		net(784, 30, 10);
 	struct Data* train_data =  NULL;
 	struct Data* test_data = NULL;
@@ -60,7 +59,6 @@ int main()
 	cout << "Reading data for train\n";
 	while (getline(train, line))
 		get_data(line, &train_data);
-
 	cout << "Reading data for test\n";
 	while (getline(test, line))
 		get_data(line, &test_data);

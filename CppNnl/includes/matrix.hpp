@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 15:15:38 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/27 23:18:12 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/29 00:20:43 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ class Matrix
 		Matrix	transpose();
 		Matrix	mult(Matrix to_mult);
 		Matrix	clone();
+		void	shape();
 };
 
 
