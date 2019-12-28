@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 22:43:47 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/27 23:13:58 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/28 17:16:49 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ struct Data
 	struct Data *next;
 };
 
-void	data_push(struct Data **head, Matrix label, Matrix input);
-
+void	push_data(struct Data **head, Matrix label, Matrix input);
+void	del_data(struct Data **head);
+int		len_data(struct Data *head);
 
 #endif

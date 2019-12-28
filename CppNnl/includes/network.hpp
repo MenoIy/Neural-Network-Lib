@@ -6,13 +6,14 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 18:22:32 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/27 23:17:07 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/28 21:46:53 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef NETWORK_HPP
 # define NETWORK_HPP
 # include "matrix.hpp"
+#include "list.hpp"
 
 class Network
 {
@@ -43,7 +44,8 @@ class Network
 	}
 	void	print();
 	Matrix	feedForward(Matrix input);
-	void	train(Matrix inputs, Matrix tagets, double lr);
+	void	train(Matrix inputs, Matrix targets, double lr, int mini_batch_size);
+	void	sgd(struct Data *training_data, int epochs, int mini_batch_size, double lr, struct Data *test_data);
 
 };
 
