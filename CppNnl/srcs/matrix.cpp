@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 16:06:47 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/29 00:34:39 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/30 23:12:38 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,18 @@ Matrix	Matrix::clone()
 	for (int i = 0; i < this->row; i++) { 
 		for (int j = 0; j < this->col; j++){ 
 			ret.tab[i][j] = this->tab[i][j];
+		}
+	}
+	return (ret);
+}
+
+Matrix	Matrix::prod(Matrix	to_prod)
+{	
+	Matrix ret(this->row, this->col);
+
+	for (int i = 0; i < this->row; i++){
+		for (int j = 0; j < this->col; j++){
+			ret.tab[i][j] = this->tab[i][j] * to_prod.tab[i][0];
 		}
 	}
 	return (ret);

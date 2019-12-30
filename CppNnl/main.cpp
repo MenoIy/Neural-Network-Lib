@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 16:04:44 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/29 00:46:56 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/30 23:45:34 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 #include <cstring>
 #include <string>
 #include <sstream>
-#include "list.hpp"
+//#include "list.hpp"
 #include "network.hpp"
 
-
+/*
 void	get_data(string line, struct Data **data)
 {
 	Matrix		label(10,1);
@@ -28,7 +28,7 @@ void	get_data(string line, struct Data **data)
 	double	d = 0.0;
 	while (pos < line.size())
 	{
-		if ((pos = line.find_first_of (',',pos)) != std::string::npos)
+		if ((pos = line.find_first_of (',', pos)) != std::string::npos)
 			line[pos] = ' ';
 	}
 	std::stringstream ss(line);
@@ -44,28 +44,41 @@ void	get_data(string line, struct Data **data)
 	push_data(data, label, inputs);
 }
 
+
+static void	read_data(ifstream& stm, struct Data** data)
+{
+	string	line="";
+
+	getline(stm, line);
+	while (getline(stm, line))	
+		get_data(line, data);
+}
+
 int main()
 {
 	ifstream	train("data/train.csv");
 	ifstream	test("data/test.csv");
-	string		line = "";
 	Network		net(784, 30, 10);
 	struct Data* train_data =  NULL;
 	struct Data* test_data = NULL;
 
-
-	getline(train, line);
-	getline(test, line);
 	cout << "Reading data for train\n";
-	while (getline(train, line))
-		get_data(line, &train_data);
+	read_data(train, &train_data);	
 	cout << "Reading data for test\n";
-	while (getline(test, line))
-		get_data(line, &test_data);
+	read_data(test, &test_data);
 	net.sgd(train_data, 40, 1025, 0.1, test_data);
 	del_data(&test_data);
 	del_data(&train_data);
 	test.close();
 	train.close();
+	return (0);
+}*/
+
+int main()
+{
+	int	hidden[] = {30, 30};
+	Network	net(785, 2, hidden, 10);
+	
+	net.shape();
 	return (0);
 }

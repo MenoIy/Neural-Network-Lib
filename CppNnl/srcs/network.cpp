@@ -17,22 +17,14 @@ double	sigmoidPrim(double x)
 
 double	sigmoid(double x)
 {
-	return (1 / (1 + exp(-x)));
+	return (1.0 / (1.0 + exp(-x)));
 }
 
 static double dsigmoid(double x)
 {
-	return (x * (1 - x));
+	return (x * (1.0 - x));
 }
 
-
-
-/*
- * FeedForward algorithm : 
- * out =  sigmoid (w * in + b) where w is the weight and 
- * b is the bias and in are the input from the previous layer
- * we is sigmoid to limit the result between (0, 1);
- */
 Matrix	Network::feedForward(Matrix	inputs)
 {
 	Matrix	hiddens;
@@ -121,11 +113,10 @@ void	Network::train(Matrix inputs, Matrix targets, double lr, int mini_batch_siz
 	//Errors
 	outErrors = out.sub(targets);
 
-
 	//calcule deltas hidden to out;
 	hiddens_t = hiddens.transpose();
 	out.map(dsigmoid);
-	outWeightDelta = outErrors.mult(out);
+	outWeightDelta = outErrors.prod(out);
 	outBiasDelta = outWeightDelta.clone();
 	outWeightDelta = outWeightDelta.mult(hiddens_t);
 	outWeightDelta.scale(lr / mini_batch_size);
@@ -136,7 +127,7 @@ void	Network::train(Matrix inputs, Matrix targets, double lr, int mini_batch_siz
 	//calcule deltas in to hidden;
 	inputs_t = inputs.transpose();
 	hiddens.map(dsigmoid);
-	hiddenWeightDelta = this->outWeight.transpose().mult(hiddenErrors);
+	hiddenWeightDelta = this->outWeight.transpose().mult(outBiasDelta);
 	hiddenBiasDelta = hiddenWeightDelta.clone();
 	hiddenWeightDelta = hiddenWeightDelta.mult(inputs_t);
 	hiddenBiasDelta.scale(lr / mini_batch_size);

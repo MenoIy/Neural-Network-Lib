@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 18:22:32 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/30 21:49:06 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/30 23:45:21 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,56 @@
 # define NETWORK_HPP
 #include <pthread.h> 
 # include "matrix.hpp"
-#include "list.hpp"
+//#include "list.hpp"
 
+
+class Layer
+{
+	public :
+		Matrix	weight;
+		Matrix	bias;
+
+		Layer(int row, int col)
+		{
+			weight = Matrix(row, col);
+			bias = Matrix(row, 1);
+			weight.randomize();
+			bias.randomize();
+		}
+};
+
+class Network
+{
+	public :
+		int		size;
+		vector<Layer> layer;
+		
+		Network(int inputSize, int hiddenCount, int hiddenSize[], int outputSize)
+		{
+			int	tmp;
+
+			size = hiddenCount + 1;
+			tmp = inputSize;
+			for (int i = 0; i <  hiddenCount; i++){
+				layer.push_back(Layer(hiddenSize[i], tmp));
+				tmp = hiddenSize[i];
+			}
+			layer.push_back(Layer(outputSize, tmp));
+		}
+		void	shape();
+		void	print();
+
+	//	Matrix	feedForward(Matrix input);
+	//	void	train(Matrix inputs, Matrix targets, double lr, int mini_batch_size);
+	/*	void	sgd(struct Data *training_data, int epochs, int mini_batch_size,
+					double lr, struct Data *test_data);*/
+
+};
+
+double	sigmoid(double x);
+double	relu(double x);
+
+/*
 class Network
 {
 	public :
@@ -36,7 +84,7 @@ class Network
 		Matrix	outBias;
 		double	lr;
 	
-	/*methode*/
+	//methode
 	Network(int in, int hid, int out)
 	{
 		input = in;
@@ -66,13 +114,13 @@ class Network
 		out_b.randomize();
 	}
 	void	print();
-	Matrix	feedForward(Matrix input);
+d	Matrix	feedForward(Matrix input);
 	void	train(Matrix inputs, Matrix targets, double lr, int mini_batch_size);
 	void	sgd(struct Data *training_data, int epochs, int mini_batch_size, double lr, struct Data *test_data);
 
 };
 
-double	sigmoid(double x);
+double	sigmoid(double x);*/
 
 
 
