@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 16:06:47 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/31 23:46:09 by kdaou            ###   ########.fr       */
+/*   Updated: 2020/01/01 18:23:02 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,12 @@ Matrix	Matrix::transpose()
 
 Matrix	Matrix::mult(Matrix to_mult)
 {
+	if (this->col != to_mult.row)
+	{
+		cout << "Matrix shape error\n ";
+		this->shape();
+		to_mult.shape();
+	}
 	Matrix ret(this->row, to_mult.col);
 	double	sum;
 

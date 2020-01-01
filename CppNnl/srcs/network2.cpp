@@ -121,6 +121,7 @@ Matrix	Network::feedForward(Matrix	inputs)
 
 	in = inputs;
 	for (int i = 0; i < this->size; i++){
+
 		this->layer[i].activation = this->layer[i].weight.mult(in);
 		this->layer[i].activation = this->layer[i].activation.add(this->layer[i].bias);
 		this->layer[i].beforActivation = this->layer[i].activation.clone();
@@ -137,21 +138,26 @@ void	Network::backPropagation(Matrix inputs, Matrix labels, double lr, double n)
 	vector<Matrix>	delta_b;
 	Matrix			delta;
 	Matrix			sp;
+	Matrix			out;
 
 	len = this->size - 1;
-	delta = this->layer[len].activation.sub(labels);
+	out = this->feedForward(inputs);
+	delta = out.sub(labels);
 	sp = this->layer[len].beforActivation;
 	sp.map(&sigmoidPrim);
-	delta = delta.mult(sp);
+	delta = delta.prod(sp);
 	delta_b.push_back(delta);
 	delta_w.push_back(delta.mult((layer[len - 1].activation).transpose()));
-	for (int i = len - 1 ; i >= 0; i--)
+	for (int i = len - 1; i >= 0; i--)
 	{
-		sp = this->layer[i].beforActivation;
+		sp = this->layer[i].beforActivation.clone();
 		sp.map(&sigmoidPrim);
-		delta = this->layer[i + 1].weight.transpose().mult(delta);
+		Matrix trans = this->layer[i + 1].weight.transpose();
+		delta = trans.mult(delta);
+		delta = delta.prod(sp);
 		delta = delta.prod(sp);
 		delta_b.push_back(delta);
+
 		if (i - 1 >= 0)
 			delta_w.push_back(delta.mult((layer[i - 1].activation).transpose()));
 		else
@@ -159,8 +165,8 @@ void	Network::backPropagation(Matrix inputs, Matrix labels, double lr, double n)
 	}
 	for (int i = 0; i < this->size; i++)
 	{
-		delta_w[this->size - 1 - i].scale(lr / n);
-		delta_b[this->size - 1 - i].scale(lr / n);
+		delta_w[this->size - 1 - i].scale(lr);
+		delta_b[this->size - 1 - i].scale(lr);
 		this->layer[i].weight = this->layer[i].weight.sub(delta_w[this->size - 1 -i]);
 		this->layer[i].bias = this->layer[i].bias.sub(delta_w[this->size - 1 -i]);
 	}
@@ -194,12 +200,12 @@ void	Network::sgd(struct Data* training_data, int epochs, int mini_batch_size, d
 
 	if (test_data)
 		test_size = len_data(test_data);
-	training = training_data;
 	for (int j = 1; j <= epochs; j++)
 	{
 		good = 0;
 		test = test_data;
-		for (int i = 0; training && i < mini_batch_size; i++)
+		training = training_data;
+		while (training)
 		{
 			this->backPropagation(training->input, training->label, lr, mini_batch_size);
 			training = training->next;

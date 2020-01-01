@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 18:22:32 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/31 23:51:31 by kdaou            ###   ########.fr       */
+/*   Updated: 2020/01/01 17:22:35 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ class Network
 		Network(int inputSize, int hiddenCount, int hiddenSize[], int outputSize)
 		{
 			int	tmp;
-
 			size = hiddenCount + 1;
 			tmp = inputSize;
 			for (int i = 0; i <  hiddenCount; i++){
