@@ -19,12 +19,7 @@ void	Network::shape()
 
 double	sigmoid(double x)
 {
-	return (1.0 / (1.0  - x));
-}
-
-double	relu(double x)
-{
-	return (x  > 0.0 ? x : 0.0);
+	return (1.0 / (1.0  + exp(-x)));
 }
 
 double	sigmoidPrim(double x)
@@ -33,61 +28,145 @@ double	sigmoidPrim(double x)
 	z = sigmoid(x);
 	return (z * (1.0 - z));
 }
-static double	reluPrim(double x)
+
+double	relu(double x)
+{
+	return (x  > 0.0 ? x : 0.0);
+}
+
+double	reluPrim(double x)
 {
 	return (x > 0.0 ? 1.0 : 0.0);
 }
-
-
-/*
-double	sigmoid(double x)
+double	leakyRelu(double x)
 {
-	return (1.0 / (1.0 + exp(-x)));
+	return (x > 0.0 ? x : 0.01 * x);
 }
 
-static double dsigmoid(double x)
+Matrix	crossEntropyPrim(Matrix	out, Matrix label)
 {
-	return (x * (1.0 - x));
-}
+	Matrix	res(out.row, out.col);
+	double y;
+	double o;
 
-static double	relu(double x)
-{
-	return (x > 0.0 ? x : 0.0);
-}
-
-
-static void softmax(Matrix *t)
-{
-	double	sum = 0;
-
-	for (int i = 0; i < t->row; i++)	{
-		sum += exp(t->tab[i][0]);
+	for (int i = 0; i < out.row; i++)
+	{
+		y = label.tab[i][0];
+		o = out.tab[i][0];
+		res.tab[i][0] = -1 * (y  * (1 / o) + (1 - y) * (1 / (1 - o)));
 	}
-	for (int i = 0; i < t->row; i++)	{
-		t->tab[i][0] = exp(t->tab[i][0]) / sum;
+	return res;
+}
+
+Matrix	softmaxPrim(Matrix	s)
+{
+	double sum ;
+	Matrix	res(s.row, s.col);
+
+	sum = 0;
+	for (int i = 0; i < s.row; i++){
+		sum += exp(s.tab[i][0]);
 	}
+	for (int i = 0; i < s.row; i++){
+		res.tab[i][0] = (exp(s.tab[i][0]) * (sum - exp(s.tab[i][0]))) / (sum * sum);
+	}
+	return res;
+}
+
+void	softmax(Matrix	*s)
+{
+	double sum ;
+
+	sum = 0;
+	for (int i = 0; i < s->row; i++){
+		sum += exp(s->tab[i][0]);
+	}
+	for (int i = 0; i < s->row; i++){
+		s->tab[i][0] = exp(s->tab[i][0]) / sum;
+	}
+}
+
+static double clip(double x, double min , double max)
+{
+	return (x < min ? min : x > max ? max : x);
+}
+
+double	Network::getError(Matrix out, Matrix label)
+{
+	double sum;
+
+	sum = 0;
+	for (int i = 0; i < out.row; i++){
+		sum += 0.5 * pow((label.tab[i][0] - out.tab[i][0]), 2);
+	}
+	return (sum);
+}
+
+double	Network::crossEntropy(Matrix out, Matrix label)
+{
+	double sum;
+
+	sum = 0.0;
+	for (int i = 0; i < out.row; i++)
+	{
+		sum -= (label.tab[i][0] * log10(out.tab[i][0]) +
+				( 1 - label.tab[i][0]) * log10(1 - out.tab[i][0]));
+	}
+	return (sum);
 }
 
 Matrix	Network::feedForward(Matrix	inputs)
 {
-	Matrix	hidden_1; // layer 1 output;
-	Matrix	hidden_2; // layer 2 output;
-	Matrix	out; // final output
+	Matrix	in;
 
-	//Layer 1:
-	hidden_1 = this->hidden_1_w.mult(inputs); // i * h1w
-	hidden_1 = hidden_1.add(this->hidden_1_b); // i * h1w + h1b
-	hidden_1.map(&relu); // relu(i * h1w + h1b)
-	//layer 2 :
-	hidden_2 = this->hidden_2_w.mult(hidden_1); // h1 * h2w
-	hidden_2 = hidden_2.add(this->hidden_2_b); // h1 * h2w + h2b
-	hidden_2.map(&sigmoid); //  sigmoid (h1 * h2w + h2b)
-	//final output :
-	out = this->out_w.mult(hidden_2); // h2 * ow
-	out = out.add(this->out_b); // h2 * ow + ob
-	softmax(&(out)); // softmax(h2 * ow + ob)
-	return out;
+	in = inputs;
+	for (int i = 0; i < this->size; i++){
+		this->layer[i].activation = this->layer[i].weight.mult(in);
+		this->layer[i].activation = this->layer[i].activation.add(this->layer[i].bias);
+		this->layer[i].beforActivation = this->layer[i].activation.clone();
+		this->layer[i].activation.map(&sigmoid);
+		in  = this->layer[i].activation;
+	}
+	return (in);
 }
+
+void	Network::backPropagation(Matrix inputs, Matrix labels, double lr, double n)
+{
+	int	len;
+	vector<Matrix>	delta_w;
+	vector<Matrix>	delta_b;
+	Matrix			delta;
+	Matrix			sp;
+
+	len = this->size - 1;
+	delta = this->layer[len].activation.sub(labels);
+	sp = this->layer[len].beforActivation;
+	sp.map(&sigmoidPrim);
+	delta = delta.mult(sp);
+	delta_b.push_back(delta);
+	delta_w.push_back(delta.mult((layer[len - 1].activation).transpose()));
+	for (int i = len - 1 ; i >= 0; i--)
+	{
+		sp = this->layer[i].beforActivation;
+		sp.map(&sigmoidPrim);
+		delta = this->layer[i + 1].weight.transpose().mult(delta);
+		delta = delta.prod(sp);
+		delta_b.push_back(delta);
+		if (i - 1 >= 0)
+			delta_w.push_back(delta.mult((layer[i - 1].activation).transpose()));
+		else
+			delta_w.push_back(delta.mult((inputs).transpose()));
+	}
+	for (int i = 0; i < this->size; i++)
+	{
+		delta_w[this->size - 1 - i].scale(lr / n);
+		delta_b[this->size - 1 - i].scale(lr / n);
+		this->layer[i].weight = this->layer[i].weight.sub(delta_w[this->size - 1 -i]);
+		this->layer[i].bias = this->layer[i].bias.sub(delta_w[this->size - 1 -i]);
+	}
+}
+
+
 
 static int	get_index(Matrix tmp)
 {
@@ -105,8 +184,7 @@ static int	get_index(Matrix tmp)
 	return m;
 }
 
-void	Network::sgd(struct Data* training_data,
-		int epochs, int mini_batch_size, double lr, struct Data* test_data = NULL)
+void	Network::sgd(struct Data* training_data, int epochs, int mini_batch_size, double lr, struct Data* test_data = NULL)
 {
 	struct Data *training;
 	struct Data	*test;
@@ -123,7 +201,7 @@ void	Network::sgd(struct Data* training_data,
 		test = test_data;
 		for (int i = 0; training && i < mini_batch_size; i++)
 		{
-			this->train(training->input, training->label, lr, mini_batch_size);
+			this->backPropagation(training->input, training->label, lr, mini_batch_size);
 			training = training->next;
 		}
 		while (test)
@@ -136,7 +214,7 @@ void	Network::sgd(struct Data* training_data,
 		cout << "Epoch " << j << " : {" << good << " / " << test_size << "}.\n";
 	}
 }
-
+/*
 void	Network::train(Matrix inputs, Matrix targets, double lr, int mini_batch_size)
 {
 	Matrix	hidden_1; // layer 1 output;

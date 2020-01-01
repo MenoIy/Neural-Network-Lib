@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 16:04:44 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/30 23:45:34 by kdaou            ###   ########.fr       */
+/*   Updated: 2020/01/01 16:36:28 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 #include <cstring>
 #include <string>
 #include <sstream>
-//#include "list.hpp"
+#include "list.hpp"
 #include "network.hpp"
 
-/*
+
 void	get_data(string line, struct Data **data)
 {
 	Matrix		label(10,1);
@@ -50,15 +50,20 @@ static void	read_data(ifstream& stm, struct Data** data)
 	string	line="";
 
 	getline(stm, line);
-	while (getline(stm, line))	
+	int i = 1025;
+	while (getline(stm, line) && i)
+	{	
+		i--;
 		get_data(line, data);
+	}
 }
 
 int main()
 {
 	ifstream	train("data/train.csv");
 	ifstream	test("data/test.csv");
-	Network		net(784, 30, 10);
+	int	hidden[] = {30};
+	Network	net(785, 1, hidden, 10);
 	struct Data* train_data =  NULL;
 	struct Data* test_data = NULL;
 
@@ -66,19 +71,11 @@ int main()
 	read_data(train, &train_data);	
 	cout << "Reading data for test\n";
 	read_data(test, &test_data);
-	net.sgd(train_data, 40, 1025, 0.1, test_data);
+	net.sgd(train_data, 1, 1025, 0.03, test_data);
 	del_data(&test_data);
 	del_data(&train_data);
 	test.close();
 	train.close();
 	return (0);
-}*/
-
-int main()
-{
-	int	hidden[] = {30, 30};
-	Network	net(785, 2, hidden, 10);
-	
-	net.shape();
-	return (0);
 }
+

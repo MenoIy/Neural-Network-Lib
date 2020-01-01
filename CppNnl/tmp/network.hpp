@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 18:22:32 by kdaou             #+#    #+#             */
-/*   Updated: 2019/12/30 23:45:21 by kdaou            ###   ########.fr       */
+/*   Updated: 2019/12/31 23:51:31 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 # define NETWORK_HPP
 #include <pthread.h> 
 # include "matrix.hpp"
-//#include "list.hpp"
+# define EPSILON 0.0000000000001
+#include "list.hpp"
 
 
 class Layer
@@ -22,6 +23,8 @@ class Layer
 	public :
 		Matrix	weight;
 		Matrix	bias;
+		Matrix	activation;
+		Matrix	beforActivation;
 
 		Layer(int row, int col)
 		{
@@ -50,18 +53,23 @@ class Network
 			}
 			layer.push_back(Layer(outputSize, tmp));
 		}
+		Matrix	feedForward(Matrix input);
+		double	crossEntropy(Matrix	out, Matrix label);
+		double	getError(Matrix out, Matrix label);
+		void	backPropagation(Matrix inputs, Matrix labels, double lr, double n);
+		void	sgd(struct Data* training_data, int epochs, int mini_batch_size, double lr, struct Data* test_data);
 		void	shape();
 		void	print();
 
-	//	Matrix	feedForward(Matrix input);
-	//	void	train(Matrix inputs, Matrix targets, double lr, int mini_batch_size);
-	/*	void	sgd(struct Data *training_data, int epochs, int mini_batch_size,
-					double lr, struct Data *test_data);*/
-
 };
 
-double	sigmoid(double x);
-double	relu(double x);
+double			sigmoid(double x);
+double			relu(double x);
+double			sigmoidPrim(double x);
+double			reluPrim(double x);
+void			softmax(Matrix *s);
+double			leakyRelu(double x);
+
 
 /*
 class Network
