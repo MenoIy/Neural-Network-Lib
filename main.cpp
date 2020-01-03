@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 16:04:44 by kdaou             #+#    #+#             */
-/*   Updated: 2020/01/01 19:31:34 by kdaou            ###   ########.fr       */
+/*   Updated: 2020/01/03 15:28:21 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ void	get_data(string line, struct Data **data)
 	push_data(data, label, inputs);
 }
 
-
 static void	read_data(ifstream& stm, struct Data** data)
 {
 	string	line="";
@@ -58,16 +57,16 @@ int main()
 {
 	ifstream	train("data/train.csv");
 	ifstream	test("data/test.csv");
-	int	hidden[] = {30};
-	Network	net(784, 1, hidden, 10);
+	int	hidden[] = {20};
+	Network	net(11, 1, hidden, 2);
 	struct Data* train_data =  NULL;
 	struct Data* test_data = NULL;
 
-/*	cout << "Reading data for train\n";
-	read_data(train, &train_data);	*/
+	cout << "Reading data for train\n";
+	read_data(train, &train_data);	
 	cout << "Reading data for test\n";
 	read_data(test, &test_data);
-	net.sgd(test_data, 160, 1000, 0.1, test_data);
+	net.sgd(train_data, 60, 1025, 0.1, test_data);
 	del_data(&test_data);
 	del_data(&train_data);
 	test.close();
