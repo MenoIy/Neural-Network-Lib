@@ -1,6 +1,5 @@
 #include "network.hpp"
 
-
 void	Network::print()
 {
 	for (int i = 0; i < this->size; i++){
@@ -42,6 +41,10 @@ double	leakyRelu(double x)
 {
 	return (x > 0.0 ? x : 0.01 * x);
 }
+double	leakyReluPrim(double x)
+{
+	return (x < 0 ? 0.01  : 1);
+}
 
 Matrix	crossEntropyPrim(Matrix	out, Matrix label)
 {
@@ -53,6 +56,7 @@ Matrix	crossEntropyPrim(Matrix	out, Matrix label)
 	{
 		y = label.tab[i][0];
 		o = out.tab[i][0];
+		o = o == 0 ? EPSILON : o == 1 ? 1 - EPSILON : o;
 		res.tab[i][0] = -1 * (y  * (1 / o) + (1 - y) * (1 / (1 - o)));
 	}
 	return res;
@@ -105,17 +109,20 @@ double	Network::getError(Matrix out, Matrix label)
 double	Network::crossEntropy(Matrix out, Matrix label)
 {
 	double sum;
+	double o, y;
 
 	sum = 0.0;
 	for (int i = 0; i < out.row; i++)
 	{
-		sum -= (label.tab[i][0] * log10(out.tab[i][0]) +
-				( 1 - label.tab[i][0]) * log10(1 - out.tab[i][0]));
+		o = out.tab[i][0];
+		y = label.tab[i][0];
+		sum -= (y * log10(o == 0 ? EPSILON : o) +
+				( 1 - y) * log10(1 - o == 0 ? 1 - o + EPSILON: 1 - o));
 	}
 	return (sum);
 }
 
-Matrix	Network::feedForward(Matrix	inputs)
+Matrix	Network::feedForward_v1(Matrix	inputs)
 {
 	Matrix	in;
 
@@ -131,7 +138,7 @@ Matrix	Network::feedForward(Matrix	inputs)
 	return (in);
 }
 
-void	Network::backPropagation(Matrix inputs, Matrix labels, double lr, double n)
+void	Network::backPropagation_v1(Matrix inputs, Matrix labels, double lr, double n)
 {
 	int	len;
 	vector<Matrix>	delta_w;
@@ -141,7 +148,7 @@ void	Network::backPropagation(Matrix inputs, Matrix labels, double lr, double n)
 	Matrix			out;
 
 	len = this->size - 1;
-	out = this->feedForward(inputs);
+	out = this->feedForward_v1(inputs);
 	delta = out.sub(labels);
 	sp = this->layer[len].beforActivation;
 	sp.map(&sigmoidPrim);
@@ -172,8 +179,6 @@ void	Network::backPropagation(Matrix inputs, Matrix labels, double lr, double n)
 	}
 }
 
-
-
 static int	get_index(Matrix tmp)
 {
 	int	m = 0;
@@ -190,7 +195,7 @@ static int	get_index(Matrix tmp)
 	return m;
 }
 
-void	Network::sgd(struct Data* training_data, int epochs, int mini_batch_size, double lr, struct Data* test_data = NULL)
+void	Network::sgd_v1(struct Data* training_data, int epochs, int mini_batch_size, double lr, struct Data* test_data = NULL)
 {
 	struct Data *training;
 	struct Data	*test;
@@ -207,12 +212,12 @@ void	Network::sgd(struct Data* training_data, int epochs, int mini_batch_size, d
 		training = training_data;
 		while (training)
 		{
-			this->backPropagation(training->input, training->label, lr, mini_batch_size);
+			this->backPropagation_v1(training->input, training->label, lr, mini_batch_size);
 			training = training->next;
 		}
 		while (test)
 		{
-			res = this->feedForward(test->input);
+			res = this->feedForward_v1(test->input);
 			if (get_index(test->label) == get_index(res))
 				good++;
 			test = test->next;
@@ -220,27 +225,3 @@ void	Network::sgd(struct Data* training_data, int epochs, int mini_batch_size, d
 		cout << "Epoch " << j << " : {" << good << " / " << test_size << "}.\n";
 	}
 }
-/*
-void	Network::train(Matrix inputs, Matrix targets, double lr, int mini_batch_size)
-{
-	Matrix	hidden_1; // layer 1 output;
-	Matrix	hidden_2; // layer 2 output;
-	Matrix	out; // final output
-	Matrix	tmphidden_1; // to store the value befor mapping;
-	Matrix	tmphidden_2; // to store the value befor mapping;
-	Matrix	tmpout; // to store the value befor mapping;
-
-	//Layer 1:
-	hidden_1 = this->hidden_1_w.mult(inputs); // i * h1w
-	hidden_1 = hidden_1.add(this->hidden_1_b); // i * h1w + h1b
-	hidden_1.map(&relu); // relu(i * h1w + h1b)
-	//layer 2 :
-	hidden_2 = this->hidden_2_w.mult(hidden_1); // h1 * h2w
-	hidden_2 = hidden_2.add(this->hidden_2_b); // h1 * h2w + h2b
-	hidden_2.map(&sigmoid); //  sigmoid (h1 * h2w + h2b)
-	//final output :
-	out = this->out_w.mult(hidden_2); // h2 * ow
-	out = out.add(this->out_b); // h2 * ow + ob
-	softmax(&(out)); // softmax(h2 * ow + ob)
-
-}*/

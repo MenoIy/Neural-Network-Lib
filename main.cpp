@@ -6,7 +6,7 @@
 /*   By: kdaou <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/27 16:04:44 by kdaou             #+#    #+#             */
-/*   Updated: 2020/01/03 15:28:21 by kdaou            ###   ########.fr       */
+/*   Updated: 2020/01/10 09:30:43 by kdaou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,60 +17,68 @@
 #include "list.hpp"
 #include "network.hpp"
 
+void	get_data(struct Data **train_data, struct Data **test_data, const char *train_data_path, const char *test_data_path);
 
-void	get_data(string line, struct Data **data)
+
+
+void	func(struct Data **train_data, struct Data **test_data)
 {
-	Matrix		label(10,1);
-	Matrix		inputs(784, 1);
-	std::vector< double > vd;
-
-	int pos = 0;
-	double	d = 0.0;
-	while (pos < line.size())
+	for (int i = 0; i < 100; i++)
 	{
-		if ((pos = line.find_first_of (',', pos)) != std::string::npos)
-			line[pos] = ' ';
+		int count = 0;
+		Matrix		label(2,1);
+		Matrix		inputs(9, 1);
+		inputs.randomize();
+		for (int j = 0; j < 9; j++)
+		{
+			if (inputs.tab[j][0] <= 0)
+				count++;
+		}
+		label.tab[0][0] = 0.01;
+		label.tab[0][0] = 0.01;
+
+		if (count > 4)
+			label.tab[0][0] = 0.99;
+		else
+			label.tab[1][0] = 0.99;
+
+		push_data(train_data, label, inputs);
 	}
-	std::stringstream ss(line);
-	while (ss >> d)
+	for (int i = 0; i < 10; i++)
 	{
-		vd.push_back(d);
-		if (ss.peek() == ',')
-			ss.ignore();
+		int count = 0;
+		Matrix		label(2,1);
+		Matrix		inputs(9, 1);
+		inputs.randomize();
+		for (int j = 0; j < 9; j++)
+		{
+			if (inputs.tab[j][0] <= 0)
+				count++;
+		}
+
+		label.tab[0][0] = 0.01;
+		label.tab[0][0] = 0.01;
+		if (count > 4)
+			label.tab[0][0] = 0.99;
+		else
+			label.tab[1][0] = 0.99;
+		push_data(test_data, label, inputs);
 	}
-	label.tab[vd[0]][0] = 1.0;
-	for (int i = 1; i < 785; i++)
-		inputs.tab[i - 1][0] = vd[i];
-	push_data(data, label, inputs);
-}
-
-static void	read_data(ifstream& stm, struct Data** data)
-{
-	string	line="";
-
-	getline(stm, line);
-	while (getline(stm, line) )
-		get_data(line, data);
 }
 
 int main()
 {
-	ifstream	train("data/train.csv");
-	ifstream	test("data/test.csv");
-	int	hidden[] = {20};
-	Network	net(11, 1, hidden, 2);
+	int	hidden[] = {5, 5};
+	Network	net(784,2, hidden, 10);
 	struct Data* train_data =  NULL;
 	struct Data* test_data = NULL;
 
-	cout << "Reading data for train\n";
-	read_data(train, &train_data);	
-	cout << "Reading data for test\n";
-	read_data(test, &test_data);
-	net.sgd(train_data, 60, 1025, 0.1, test_data);
+	get_data(&train_data, &test_data, "data/train.csv", "data/test.csv");
+	//func(&train_data, &test_data);
+	cout << "start training \n";
+	net.sgd_v1(train_data, 50, 1025, 0.1, test_data);
 	del_data(&test_data);
 	del_data(&train_data);
-	test.close();
-	train.close();
 	return (0);
 }
 
